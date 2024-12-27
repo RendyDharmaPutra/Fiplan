@@ -1,6 +1,7 @@
 package initialize
 
 import (
+	"fiplan-backend/modules/auth"
 	"fiplan-backend/modules/user"
 
 	"gorm.io/gorm"
@@ -8,6 +9,7 @@ import (
 
 type Module struct {
 	UserService user.Service
+	AuthService auth.Service
 }
 
 func InitializeModules(db *gorm.DB) *Module {
@@ -15,5 +17,6 @@ func InitializeModules(db *gorm.DB) *Module {
 
 	return &Module{
 		UserService: user.NewService(repositories.UserRepo),
+		AuthService: auth.NewService(repositories.UserRepo),
 	}
 }

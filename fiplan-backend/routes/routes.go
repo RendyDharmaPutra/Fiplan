@@ -11,7 +11,7 @@ import (
 
 func SetupRoutes(app *fiber.App, module *initialize.Module) {
 	authGroup :=  app.Group("/auth")
-	auth.AuthController(authGroup, module.UserService)
+	auth.AuthController(authGroup, module.AuthService)
 
 	userGroup := app.Group("/users")
 	user.UserController(userGroup, module.UserService)
