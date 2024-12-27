@@ -2,6 +2,4 @@ main
 
 tmp/
 
-.env
-
 .air.toml
