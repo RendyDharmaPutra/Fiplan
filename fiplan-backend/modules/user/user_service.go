@@ -2,9 +2,9 @@ package user
 
 import (
 	"errors"
-	"strconv"
+	"fiplan-backend/utils"
+	"fmt"
 
-	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
 
@@ -14,9 +14,9 @@ type service struct {
 }
 
 type Service interface {
-	GetAllUsers(ctx *fiber.Ctx) error
-	GetUser(ctx *fiber.Ctx) error
-	CreateUser(ctx *fiber.Ctx) error
+	GetAllUsers() ([]User, error)
+	GetUser(id uint) (*User, error)
+	CreateUser(username, password string) error
 }
 
 
@@ -24,71 +24,42 @@ func NewService(repo Repository) Service {
 	return &service{repo: repo}
 }
 
-func (service *service) GetAllUsers(ctx *fiber.Ctx) error {
+func (service *service) GetAllUsers() ([]User, error) {
 	users, err := service.repo.FindAll()
-	
 	if err != nil {
-		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": "Gagal Mendapatkan data User",
-		})
+		return nil, fmt.Errorf("gagal mendapatkan data pengguna, %s", err.Error())
 	}
 
-	return ctx.JSON(users)
+	return users, nil
 }
 
-func (service *service) GetUser(ctx  *fiber.Ctx) error {
-	id, err := strconv.Atoi(ctx.Params("id"))
-    if err != nil {
-        return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"status": "failed",
-			"message": "Gagal Mendapatkan data Pengguna",
-			"error": "Format ID tidak valid",
-        })
-    }
-
-	user, err :=  service.repo.FindOne(uint(id))
+func (service *service) GetUser(id uint) (*User, error){
+	user, err :=  service.repo.FindOne(id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return ctx.Status(fiber.StatusNotFound).JSON(fiber.Map{
-				"status": "failed",
-				"message": "Gagal Mendapatkan data Pengguna",
-				"error": "Pengguna  tidak ditemukan",
-			})
+			return nil, fmt.Errorf("pengguna tidak ditemukan")
 		}
 
-
-		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"status": "failed",
-			"message": "Gagal Mendapatkan data Pengguna",
-			"error": err,
-		})
+		return nil, fmt.Errorf("terjadi kesalahan, %s", err.Error())
 	}
 
-	return ctx.JSON(user)
+	return user, nil
 }
 
-func (service *service) CreateUser(ctx *fiber.Ctx) error {
-	var user User
-	
-	if err := ctx.BodyParser(&user); err != nil {
-		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"status": "failed",
-			"message": "Gagal memproses data user yang diberikan",
-			"err": err,
-		})
+func (service *service) CreateUser(username, password string) error {
+	hashedPassword, err := utils.HashPassword(password) 
+	if err != nil {
+		return fmt.Errorf("gagal Hash Password, %s", err)
 	}
 
+	user := User{
+		Username: username,
+		Password: hashedPassword,
+		Token: "",
+	}
 	if err := service.repo.SaveUser(&user); err != nil {
-		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"status": "failed",
-			"message": "Gagal menyimpan data yang diberikan",
-			"error": err,
-		})
+		return fmt.Errorf("gagal menyimpan Pengguna, %s", err)
 	}
 
-	return ctx.Status(fiber.StatusCreated).JSON(fiber.Map{
-		"status": "success",
-		"message": "Berhasil mendaftar pengguna",
-		"pengguna": user,
-	})
+	return nil
 }

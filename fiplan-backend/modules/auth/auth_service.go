@@ -33,6 +33,5 @@ func (service *service) Register(username, password string) error {
 		return fmt.Errorf("gagal menyimpan Pengguna, %s", err)
 	}
 
-
 	return nil
 }

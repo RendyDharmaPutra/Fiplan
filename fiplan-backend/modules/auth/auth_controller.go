@@ -13,21 +13,23 @@ func AuthController(group fiber.Router, service Service) {
 		
 		if err := ctx.BodyParser(&request); err != nil {
 			return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"error": "Gagal memproses data user yang diberikan",
+				"status": "Failed",
+				"message": "Gagal mendaftarkan pengguna",
+				"error": "Gagal memproses data yang diberikan",
 			})
 		}
 
 		if err := service.Register(request.Username, request.Password); err != nil {
 			return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 				"status": "Failed",
-				"message": "Terjadi Kesalahan",
+				"message": "Gagal mendaftarkan pengguna",
 				"error": err.Error(),
 			})
 		}
 
 		return ctx.Status(fiber.StatusCreated).JSON(fiber.Map{
 			"status": "success",
-			"message": "Berhasil mendaftar pengguna",
+			"message": "Berhasil mendaftarkan pengguna",
 		})
 	})
 }
