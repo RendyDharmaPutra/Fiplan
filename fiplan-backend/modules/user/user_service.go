@@ -1,11 +1,7 @@
 package user
 
 import (
-	"errors"
 	"fiplan-backend/utils"
-	"fmt"
-
-	"gorm.io/gorm"
 )
 
 
@@ -27,20 +23,17 @@ func NewService(repo Repository) Service {
 func (service *service) GetAllUsers() ([]User, error) {
 	users, err := service.repo.FindAll()
 	if err != nil {
-		return nil, fmt.Errorf("gagal mendapatkan data pengguna, %s", err.Error())
+		return nil, err
 	}
 
 	return users, nil
 }
 
 func (service *service) GetUser(id uint) (*User, error){
-	user, err :=  service.repo.FindOne(id)
+	filters := map[string]interface{}{"id": id,}
+	user, err :=  service.repo.FindOne(filters)
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, fmt.Errorf("pengguna tidak ditemukan")
-		}
-
-		return nil, fmt.Errorf("terjadi kesalahan, %s", err.Error())
+		return nil, err
 	}
 
 	return user, nil
@@ -49,7 +42,7 @@ func (service *service) GetUser(id uint) (*User, error){
 func (service *service) CreateUser(username, password string) error {
 	hashedPassword, err := utils.HashPassword(password) 
 	if err != nil {
-		return fmt.Errorf("gagal Hash Password, %s", err)
+		return err
 	}
 
 	user := User{
@@ -58,7 +51,7 @@ func (service *service) CreateUser(username, password string) error {
 		Token: "",
 	}
 	if err := service.repo.SaveUser(&user); err != nil {
-		return fmt.Errorf("gagal menyimpan Pengguna, %s", err)
+		return err
 	}
 
 	return nil
