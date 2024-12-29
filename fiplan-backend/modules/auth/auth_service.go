@@ -12,7 +12,7 @@ type service struct {
 
 type Service interface {
 	Register(useranme, password string) error
-	Login(useranme, password string) (string, error)
+	Login(useranme, password string) (int, string, error)
 	Profile(id interface{}) (*user.User, error)
 }
 
@@ -29,7 +29,6 @@ func (service *service) Register(username, password string) error {
 	user := user.User{
 		Username: username,
 		Password: hashedPassword,
-		Token: "",
 	}
 	if err := service.repo.SaveUser(&user); err != nil {
 		return err
@@ -38,26 +37,33 @@ func (service *service) Register(username, password string) error {
 	return nil
 }
 
-func (service *service) Login(username, password  string) (string, error) {
+func (service *service) Login(username, password  string) (int, string, error) {
+	statusCode := 500
+	
 	user, err :=  service.repo.FindOne(map[string]interface{}{"Username": username})
 	if err != nil {
 		if err.Error() == "pengguna tidak ditemukan" {
+			statusCode = 400
 			err = errors.New("username tidak ditemukan")
 		}
 
-		return "", err
+		return statusCode, "", err
 	}
 
 	if err := utils.VerifyPassword(user.Password, password); err != nil {
-		return "", err
+		if err.Error() == "password tidak cocok" {
+			statusCode = 400
+		}
+
+		return statusCode, "", err
 	}
 
 	token, err := utils.GenerateJWT(user.ID)
 	if err != nil {
-		return "", err
+		return statusCode, "", err
 	}
 
-	return token, err
+	return statusCode, token, err
 }
 
 func (service *service) Profile(id interface{}) (*user.User, error) {

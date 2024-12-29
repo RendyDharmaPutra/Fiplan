@@ -67,7 +67,7 @@ func (repo *repository) FindOne(filters map[string]interface{}) (*User, error) {
 func (repo *repository) SaveUser(user *User) error {
 	if err := repo.db.Create(user).Error; err != nil {
 		if err.(*mysql.MySQLError).Number == 1062 {
-			err = errors.New("username tidak boleh sama")
+			err = errors.New("username telah digunakan")
 		} else {
 			log.Printf("Error tidak diketahui : %v", err.Error())
 			

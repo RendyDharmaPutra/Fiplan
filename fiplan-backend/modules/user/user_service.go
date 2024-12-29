@@ -48,7 +48,6 @@ func (service *service) CreateUser(username, password string) error {
 	user := User{
 		Username: username,
 		Password: hashedPassword,
-		Token: "",
 	}
 	if err := service.repo.SaveUser(&user); err != nil {
 		return err

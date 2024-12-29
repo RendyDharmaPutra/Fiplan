@@ -35,7 +35,7 @@ func NewSuccessResponse(message string, data ...interface{}) fiber.Map {
 	})
 }
 
-func NewFailedResponse(message, err string) fiber.Map {
+func NewFailedResponse(message string, err interface{}) fiber.Map {
 	return NewResponse(StatusFailed, message, map[string]interface{}{
 		"error": err,
 	})
