@@ -37,6 +37,25 @@ func AuthController(group fiber.Router, service Service) {
 			return ctx.Status(fiber.StatusInternalServerError).JSON(common.NewFailedResponse("Gagal mengautentikasi pengguna", err.Error()))
 		}
 		
-		return ctx.Status(fiber.StatusCreated).JSON(common.NewSuccessResponse("Berhasil mengautentikasi pengguna", map[string]interface{}{"token": token}))
+		return ctx.Status(fiber.StatusOK).JSON(common.NewSuccessResponse("Berhasil mengautentikasi pengguna", map[string]interface{}{"token": token}))
+	})
+	
+	
+	group.Get("/logout", func(ctx *fiber.Ctx) error {
+		return ctx.Status(fiber.StatusOK).JSON(common.NewSuccessResponse("Berhasil melakukan logout"))
+	})
+	
+	group.Get("/profile", func (ctx *fiber.Ctx) error  {
+		id := ctx.Locals("id")
+		if id == nil {
+			return ctx.Status(fiber.StatusInternalServerError).JSON(common.NewFailedResponse("Gagal mendapatkan profil pengguna", "Id tidak ditemukan"))			
+		}	
+
+		user, err := service.Profile(id)
+		if err != nil {
+			return ctx.Status(fiber.StatusInternalServerError).JSON(common.NewFailedResponse("Gagal mengautentikasi pengguna", err.Error()))			
+		}
+	
+		return ctx.Status(fiber.StatusOK).JSON(common.NewSuccessResponse("Berhasil mendapatkan profil pengguna", map[string]interface{}{"data": user}))
 	})
 }

@@ -14,7 +14,7 @@ func UserController(group fiber.Router, service Service) {
 			return ctx.Status(fiber.StatusInternalServerError).JSON(common.NewFailedResponse("Gagal mendapatkan data pengguna", err.Error()))
 		}
 
-		return ctx.Status(fiber.StatusCreated).JSON(common.NewSuccessResponse("Berhasil mendapatkan data pengguna", users))
+		return ctx.Status(fiber.StatusOK).JSON(common.NewSuccessResponse("Berhasil mendapatkan data pengguna", users))
 	})
 
 	group.Get("/:id", func(ctx *fiber.Ctx) error {
@@ -28,7 +28,7 @@ func UserController(group fiber.Router, service Service) {
 			return ctx.Status(fiber.StatusInternalServerError).JSON(common.NewFailedResponse("Gagal mendapatkan data pengguna",  err.Error()))
 		}
 
-		return ctx.Status(fiber.StatusCreated).JSON(common.NewSuccessResponse("Berhasil mendapatkan data pengguna", user))
+		return ctx.Status(fiber.StatusOK).JSON(common.NewSuccessResponse("Berhasil mendapatkan data pengguna", user))
 	})
 
 	group.Post("/", func (ctx *fiber.Ctx) error {

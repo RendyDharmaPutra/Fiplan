@@ -13,6 +13,7 @@ type service struct {
 type Service interface {
 	Register(useranme, password string) error
 	Login(useranme, password string) (string, error)
+	Profile(id interface{}) (*user.User, error)
 }
 
 func NewService(repo user.Repository) Service  {
@@ -38,8 +39,7 @@ func (service *service) Register(username, password string) error {
 }
 
 func (service *service) Login(username, password  string) (string, error) {
-	filters := map[string]interface{}{"Username": username}
-	user, err :=  service.repo.FindOne(filters)
+	user, err :=  service.repo.FindOne(map[string]interface{}{"Username": username})
 	if err != nil {
 		if err.Error() == "pengguna tidak ditemukan" {
 			err = errors.New("username tidak ditemukan")
@@ -52,14 +52,19 @@ func (service *service) Login(username, password  string) (string, error) {
 		return "", err
 	}
 
-	token, err := utils.GenerateRandomToken()
+	token, err := utils.GenerateJWT(user.ID)
 	if err != nil {
-		return "", err
-	}
-	
-	if err := service.repo.UpdateUser(user.ID, map[string]interface{}{"Token": token}); err != nil {
 		return "", err
 	}
 
 	return token, err
+}
+
+func (service *service) Profile(id interface{}) (*user.User, error) {
+	user, err := service.repo.FindOne(map[string]interface{}{"id": id})
+	if err !=  nil {
+		return nil, err
+	}
+
+	return user, err
 }

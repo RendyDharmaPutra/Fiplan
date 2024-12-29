@@ -1,16 +1,21 @@
 package config
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"fiplan-backend/middleware"
+
+	"github.com/gofiber/fiber/v2"
+)
 
 func SetupApp() *fiber.App {
 	app := fiber.New(fiber.Config{
 			Prefork:       false,
-		CaseSensitive: true,
-		StrictRouting: true,
-		ServerHeader:  "Fiber",
-		AppName:       "Fiplan v1.0",
-		})
+			CaseSensitive: true,
+			StrictRouting: true,
+			ServerHeader:  "Fiber",
+			AppName:       "Fiplan Backend",
+	})
 
-		return app
+	app.Use(middleware.JWTMiddleware())
 
+	return app
 }

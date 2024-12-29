@@ -5,6 +5,10 @@ import (
 	"encoding/hex"
 	"errors"
 	"log"
+	"os"
+	"time"
+
+	"github.com/golang-jwt/jwt/v4"
 )
 
 func GenerateRandomToken() (string, error) {
@@ -18,4 +22,26 @@ func GenerateRandomToken() (string, error) {
 	}
 
 	return hex.EncodeToString(bytes), nil
+}
+
+func GenerateJWT(id uint) (string, error) {
+	key := os.Getenv("SECRET_KEY")
+	
+	claims := jwt.MapClaims{
+		"id": id,
+		"exp": time.Now().Add(time.Hour * 24).Unix(),
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+	result,err := token.SignedString([]byte(key))
+	if err != nil {
+		log.Printf("Gagal membuat token, error tidak diketahui  : %v", err.Error())
+
+		result = ""
+		err = errors.New("error tidak diketahui")
+	}
+
+
+	return result, err
 }
