@@ -2,6 +2,8 @@ package user
 
 import (
 	"fiplan-backend/utils"
+
+	"github.com/google/uuid"
 )
 
 
@@ -11,7 +13,7 @@ type service struct {
 
 type Service interface {
 	GetAllUsers() ([]User, error)
-	GetUser(id uint) (*User, error)
+	GetUser(id string) (*User, error)
 	CreateUser(username, password string) error
 }
 
@@ -29,7 +31,7 @@ func (service *service) GetAllUsers() ([]User, error) {
 	return users, nil
 }
 
-func (service *service) GetUser(id uint) (*User, error){
+func (service *service) GetUser(id string) (*User, error){
 	filters := map[string]interface{}{"id": id,}
 	user, err :=  service.repo.FindOne(filters)
 	if err != nil {
@@ -46,6 +48,7 @@ func (service *service) CreateUser(username, password string) error {
 	}
 
 	user := User{
+		ID: uuid.New().String(),
 		Username: username,
 		Password: hashedPassword,
 	}

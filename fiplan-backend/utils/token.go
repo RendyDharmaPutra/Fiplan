@@ -24,7 +24,7 @@ func GenerateRandomToken() (string, error) {
 	return hex.EncodeToString(bytes), nil
 }
 
-func GenerateJWT(id uint) (string, error) {
+func GenerateJWT(id string) (string, error) {
 	key := os.Getenv("SECRET_KEY")
 	
 	claims := jwt.MapClaims{

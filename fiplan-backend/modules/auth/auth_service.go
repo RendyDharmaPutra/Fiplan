@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fiplan-backend/modules/user"
 	"fiplan-backend/utils"
+
+	"github.com/google/uuid"
 )
 
 type service struct {
@@ -27,6 +29,7 @@ func (service *service) Register(username, password string) error {
 	}
 
 	user := user.User{
+		ID: uuid.New().String(),
 		Username: username,
 		Password: hashedPassword,
 	}

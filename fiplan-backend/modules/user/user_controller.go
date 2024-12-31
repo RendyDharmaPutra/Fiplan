@@ -2,7 +2,7 @@ package user
 
 import (
 	"fiplan-backend/common"
-	"strconv"
+	"regexp"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -18,12 +18,14 @@ func UserController(group fiber.Router, service Service) {
 	})
 
 	group.Get("/:id", func(ctx *fiber.Ctx) error {
-		id, err := strconv.Atoi(ctx.Params("id"))
-    	if err != nil {
+		id := ctx.Params("id")
+
+		uuidRegex := regexp.MustCompile(`^[a-f0-9]{8}-[a-f0-9]{4}-[1-5][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$`)
+    	if !uuidRegex.MatchString(id) {
 			return ctx.Status(fiber.StatusBadRequest).JSON(common.NewFailedResponse("Gagal mendapatkan data pengguna", "format ID tidak valid"))
     	}
 
-		user, err := service.GetUser(uint(id))
+		user, err := service.GetUser(id)
 		if err != nil {
 			return ctx.Status(fiber.StatusInternalServerError).JSON(common.NewFailedResponse("Gagal mendapatkan data pengguna",  err.Error()))
 		}

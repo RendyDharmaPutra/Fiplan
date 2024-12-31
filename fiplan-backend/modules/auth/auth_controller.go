@@ -57,6 +57,6 @@ func AuthController(group fiber.Router, service Service, validate *validator.Val
 			return ctx.Status(fiber.StatusInternalServerError).JSON(common.NewFailedResponse("Gagal mengautentikasi pengguna", err.Error()))			
 		}
 	
-		return ctx.Status(fiber.StatusOK).JSON(common.NewSuccessResponse("Berhasil mendapatkan profil pengguna", map[string]interface{}{"data": user}))
+		return ctx.Status(fiber.StatusOK).JSON(common.NewSuccessResponse("Berhasil mendapatkan profil pengguna", map[string]interface{}{"profile": user}))
 	})
 }

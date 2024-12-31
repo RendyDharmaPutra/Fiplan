@@ -58,7 +58,7 @@ func JWTMiddleware() fiber.Handler {
 				err = errors.New("format token tidak valid")
 			}
 
-			rawId, ok := id.(float64)
+			rawId, ok := id.(string)
 			if !ok {
 				log.Printf("Error saat mengambil id, tipe data id : %T, nilai id : %v", id, id)
 				err = errors.New("format token tidak valid")
@@ -68,7 +68,7 @@ func JWTMiddleware() fiber.Handler {
 				return ctx.Status(fiber.StatusUnauthorized).JSON(common.NewFailedResponse("Autentikasi gagal", err.Error()))
 			}
 	
-			ctx.Locals("id", uint(rawId))
+			ctx.Locals("id", rawId)
 		} else {
 			return ctx.Status(fiber.StatusUnauthorized).JSON(common.NewFailedResponse("Autentikasi gagal", "Format token tidak valid"))
 		}
